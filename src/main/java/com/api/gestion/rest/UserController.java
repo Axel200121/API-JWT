@@ -49,4 +49,14 @@ public class UserController {
         }
         return  new ResponseEntity<List<UserDTO>>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @PutMapping("/update-status")
+    public ResponseEntity<String> updateStatus(@RequestBody(required = true) Map<String,String> requestMap){
+        try {
+            return userService.updateStatus(requestMap);
+        }catch (Exception exception){
+            exception.printStackTrace();
+        }
+        return FacturaUtils.getResponseEntity(FacturaContants.SOMETHING_WENT_WRONG,HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

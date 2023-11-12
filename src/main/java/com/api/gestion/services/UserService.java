@@ -13,4 +13,6 @@ public interface UserService {
     ResponseEntity<String> login(Map<String,String> rquestMap);
 
     ResponseEntity<List<UserDTO>> getAllUsers();
+
+    ResponseEntity<String> updateStatus(Map<String,String> requestMap);
 }

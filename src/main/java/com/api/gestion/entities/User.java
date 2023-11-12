@@ -9,6 +9,7 @@ import java.io.Serializable;
 //Cuando se invoca la funcion en el repository user hace la consulta
 @NamedQuery(name = "User.findByEmail", query = "select u from User u where u.email=:email")
 @NamedQuery(name = "User.getAllUsers", query = "select new com.api.gestion.dto.UserDTO(u.id, u.nombre, u.email, u.numeroContacto, u.role ,u.status) from User u where u.role='user'")
+@NamedQuery(name = "User.updateStatus", query = "update User u set u.status=:status where u.id=:id")
 /*.........................................................................................*/
 
 @Data
