@@ -7,7 +7,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import java.io.Serializable;
 //Cuando se invoca la funcion en el repository user hace la consulta
-@NamedQuery(name = "User.findByEmail", query = "select u from User where u.email=:email")
+@NamedQuery(name = "User.findByEmail", query = "select u from User u where u.email=:email")
 /*.........................................................................................*/
 
 @Data
