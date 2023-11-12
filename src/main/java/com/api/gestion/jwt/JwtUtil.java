@@ -59,7 +59,7 @@ public class JwtUtil {
                 .signWith(SignatureAlgorithm.HS256,secret).compact(); //seleccionamos el algoritmo de ecriptacion y firmamos con la llave secreta
     }
 
-    private Boolean validateToken(String token, UserDetails  userDetails){
+    public Boolean validateToken(String token, UserDetails  userDetails){
         final String username = extractUserName(token);
         //si este token aun no expira y es el mismo usuario el token es valido
         return (username.equals(userDetails.getUsername()) && !isTokenExpire(token));
