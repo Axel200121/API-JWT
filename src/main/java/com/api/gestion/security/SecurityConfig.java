@@ -18,10 +18,6 @@ import org.springframework.web.cors.CorsConfiguration;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
-    @Autowired
-    private CustomerDetailsService customerDetailsService;
-
     @Autowired
     private JwtFilter jwtFilter;
 
@@ -30,27 +26,25 @@ public class SecurityConfig {
         return NoOpPasswordEncoder.getInstance();
     }
 
+    @Bean
     protected SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
                 .and()
                 .csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/user/login","/user/signup","/user/forgotPassowrd")
+                .requestMatchers("/user/login","/user/signup","/user/forgotPassword")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
                 .and().exceptionHandling()
                 .and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-        httpSecurity.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-        return  httpSecurity.build();
-
+        httpSecurity.addFilterBefore(jwtFilter,UsernamePasswordAuthenticationFilter.class);
+        return httpSecurity.build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws  Exception{
-        //obtenemos el autentifiacion manager
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception{
         return authenticationConfiguration.getAuthenticationManager();
     }
 }
