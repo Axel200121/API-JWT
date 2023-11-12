@@ -1,4 +1,4 @@
-package com.api.gestion.jwt;
+package com.api.gestion.security;
 
 import com.api.gestion.entities.User;
 import com.api.gestion.repositories.UserRepository;
