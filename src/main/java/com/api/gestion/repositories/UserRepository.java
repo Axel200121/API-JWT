@@ -19,4 +19,6 @@ public interface UserRepository extends JpaRepository<User,Integer> {
     @Transactional
     @Modifying //sirve para indicar que en el metodo van hacer operaciones insr,update y delete, no son de tipo get
     Integer updateStatus(@Param("status") String status, @Param("id") Integer id);
+
+    List<String> getAllAdmins();
 }
