@@ -124,6 +124,30 @@ public class UserServiceImpl implements UserService{
         return FacturaUtils.getResponseEntity(FacturaContants.SOMETHING_WENT_WRONG,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @Override
+    public ResponseEntity<String> checkToken() {
+        return FacturaUtils.getResponseEntity("true", HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<String> changePassword(Map<String, String> requestMap) {
+        try {
+            User user = userRepository.findByEmail(jwtFilter.getCurrentUser());
+            if (!user.equals(null)){
+                if (user.getPassword().equals(requestMap.get("oldPassword"))){
+                    user.setPassword(requestMap.get("newPassword"));
+                    userRepository.save(user);
+                    return  FacturaUtils.getResponseEntity("Contraseña actualizada con exito", HttpStatus.OK);
+                }
+                return FacturaUtils.getResponseEntity("Contraseña incorrecta",HttpStatus.BAD_REQUEST);
+            }
+            return FacturaUtils.getResponseEntity(FacturaContants.SOMETHING_WENT_WRONG,HttpStatus.BAD_REQUEST);
+        }catch (Exception exception){
+            exception.printStackTrace();
+        }
+        return FacturaUtils.getResponseEntity(FacturaContants.SOMETHING_WENT_WRONG,HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     //Funcionalidad para envir correo cuanfo se cambia el status
     /*private void sendEmailtoAdmins(String status, String user,List<String> allAdmins){
         allAdmins.remove(jwtFilter.getCurrentUser());
