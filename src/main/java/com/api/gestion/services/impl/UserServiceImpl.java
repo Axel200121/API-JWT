@@ -11,6 +11,7 @@ import com.api.gestion.security.jwt.JwtUtil;
 import com.api.gestion.services.UserService;
 import com.api.gestion.util.EmailUtils;
 import com.api.gestion.util.FacturaUtils;
+import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -42,8 +43,8 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private JwtFilter jwtFilter;
 
-    //@Autowired
-    //private EmailUtils emailUtils;
+    @Autowired
+    private EmailUtils emailUtils;
 
 
     @Override
@@ -148,6 +149,20 @@ public class UserServiceImpl implements UserService{
         return FacturaUtils.getResponseEntity(FacturaContants.SOMETHING_WENT_WRONG,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @Override
+    public ResponseEntity<String> forgotPassword(Map<String, String> requestMap) {
+        try {
+            User user = userRepository.findByEmail(requestMap.get("email"));
+            if (!Objects.isNull(user) && !Strings.isNullOrEmpty(user.getEmail())){
+                emailUtils.forgotPassword(user.getEmail(),"Credenciales del sistema gestion de facturas", user.getPassword());
+            }
+            return FacturaUtils.getResponseEntity("Verifica tus credenciales",HttpStatus.OK);
+        }catch (Exception exception){
+            exception.printStackTrace();
+        }
+        return FacturaUtils.getResponseEntity(FacturaContants.SOMETHING_WENT_WRONG,HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     //Funcionalidad para envir correo cuanfo se cambia el status
     /*private void sendEmailtoAdmins(String status, String user,List<String> allAdmins){
         allAdmins.remove(jwtFilter.getCurrentUser());
@@ -158,7 +173,6 @@ public class UserServiceImpl implements UserService{
         }
 
     }*/
-
 
     private boolean validateSignMap(Map<String, String> requestMap){
         if (requestMap.containsKey("nombre") && requestMap.containsKey("numeroContacto") &&
