@@ -42,8 +42,8 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private JwtFilter jwtFilter;
 
-    @Autowired
-    private EmailUtils emailUtils;
+    //@Autowired
+    //private EmailUtils emailUtils;
 
 
     @Override
@@ -109,7 +109,7 @@ public class UserServiceImpl implements UserService{
                 Optional<User> optionalUser = userRepository.findById(Integer.parseInt(requestMap.get("id")));
                 if (optionalUser.isPresent()){
                     userRepository.updateStatus(requestMap.get("status"),Integer.parseInt(requestMap.get("id")));
-                    sendEmailtoAdmins(requestMap.get("status"), optionalUser.get().getEmail(),userRepository.getAllAdmins());
+                    //sendEmailtoAdmins(requestMap.get("status"), optionalUser.get().getEmail(),userRepository.getAllAdmins());
                     return FacturaUtils.getResponseEntity("status del usuario actualizado",HttpStatus.OK);
                 }else{
                     FacturaUtils.getResponseEntity("Este usuario no existe",HttpStatus.NOT_FOUND);
@@ -124,7 +124,8 @@ public class UserServiceImpl implements UserService{
         return FacturaUtils.getResponseEntity(FacturaContants.SOMETHING_WENT_WRONG,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    private void sendEmailtoAdmins(String status, String user,List<String> allAdmins){
+    //Funcionalidad para envir correo cuanfo se cambia el status
+    /*private void sendEmailtoAdmins(String status, String user,List<String> allAdmins){
         allAdmins.remove(jwtFilter.getCurrentUser());
         if (status != null && status.equalsIgnoreCase("true")){
             emailUtils.sendSimpleMessage(jwtFilter.getCurrentUser(),"Cuenta Aprobada","Usuario: "+ user + "\n es aprobado por \nAdmin: "+ jwtFilter.getCurrentUser(), allAdmins);
@@ -132,7 +133,7 @@ public class UserServiceImpl implements UserService{
             emailUtils.sendSimpleMessage(jwtFilter.getCurrentUser(),"Cuenta no aprodada","Usuario: "+ user + "\n es desaprobado por \nAdmin: "+ jwtFilter.getCurrentUser(), allAdmins);
         }
 
-    }
+    }*/
 
 
     private boolean validateSignMap(Map<String, String> requestMap){
