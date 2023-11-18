@@ -6,16 +6,19 @@ import com.api.gestion.repositories.CategoryRepository;
 import com.api.gestion.security.jwt.JwtFilter;
 import com.api.gestion.services.CategoryService;
 import com.api.gestion.util.FacturaUtils;
+import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 
-@Slf4j
+@Slf4j //sir ve para los logs
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
@@ -43,6 +46,22 @@ public class CategoryServiceImpl implements CategoryService {
             exception.printStackTrace();
         }
         return FacturaUtils.getResponseEntity(FacturaContants.SOMETHING_WENT_WRONG,HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<List<Category>> getAllCategories(String valueFilter) {
+        try {
+            if (!Strings.isNullOrEmpty(valueFilter) && valueFilter.equalsIgnoreCase("true")){
+                // si el valor si no es nulo o vacio y a la vez es true sin importar si viene en mayusculas o minusculas
+                log.info("Usando el metodo getAllCategories");
+                return  new ResponseEntity<List<Category>>(categoryRepository.getAllCategories(),HttpStatus.OK);
+            }
+            return new ResponseEntity<List<Category>>(categoryRepository.findAll(),HttpStatus.OK);
+        }catch (Exception exception){
+            exception.printStackTrace();
+        }
+        log.info("Metodo findAll de JpaRespository");
+        return  new ResponseEntity<List<Category>>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private boolean validateCategoryMap(Map<String,String> requestMap, boolean validateId){

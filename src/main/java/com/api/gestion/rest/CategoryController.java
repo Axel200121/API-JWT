@@ -1,16 +1,16 @@
 package com.api.gestion.rest;
 
 import com.api.gestion.contants.FacturaContants;
+import com.api.gestion.entities.Category;
 import com.api.gestion.services.CategoryService;
 import com.api.gestion.util.FacturaUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -28,5 +28,15 @@ public class CategoryController {
             exception.printStackTrace();
         }
         return FacturaUtils.getResponseEntity(FacturaContants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @GetMapping("/get-categories")
+    public ResponseEntity<List<Category>> getAllCategories(@RequestParam(required = false) String valueFilter){
+        try {
+            return categoryService.getAllCategories(valueFilter);
+        }catch (Exception exception){
+            exception.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
