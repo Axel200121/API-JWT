@@ -6,6 +6,8 @@ import lombok.Data;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+@NamedQuery(name = "Product.getAllProducts", query ="select new com.api.gestion.dto.ProductDTO(p.id,p.nombre,p.descripcion,p.precio,p.status, p.category.id, p.category.nombre) from Product p" )
+
 @Data
 @Entity
 @DynamicUpdate
@@ -18,7 +20,7 @@ public class Product {
     private Integer id;
 
     @Column(name = "nombre")
-    private String nombrea;
+    private String nombre;
 
     //Lazzy -> me va listar la categoria cuando yo se lo pida
     //eagger -> me traer la categoria en automatico
@@ -27,7 +29,7 @@ public class Product {
     private Category category;
 
     @Column(name = "descripcion")
-    private String descrpcion;
+    private String descripcion;
 
     @Column(name = "precio")
     private Integer precio;

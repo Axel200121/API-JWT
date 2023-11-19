@@ -1,18 +1,22 @@
 package com.api.gestion.services.impl;
 
 import com.api.gestion.contants.FacturaContants;
+import com.api.gestion.dto.ProductDTO;
 import com.api.gestion.entities.Category;
 import com.api.gestion.entities.Product;
 import com.api.gestion.repositories.ProductRepository;
 import com.api.gestion.security.jwt.JwtFilter;
 import com.api.gestion.services.ProductService;
 import com.api.gestion.util.FacturaUtils;
+import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -45,6 +49,17 @@ public class ProductServiceImpl implements ProductService {
         return FacturaUtils.getResponseEntity(FacturaContants.SOMETHING_WENT_WRONG,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @Override
+    public ResponseEntity<List<ProductDTO>> getAllProducts() {
+        try {
+           return new ResponseEntity<>(productRepository.getAllProducts(),HttpStatus.OK);
+        }catch (Exception exception){
+            exception.printStackTrace();
+        }
+        return  new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
     private Product getProductFromMap(Map<String,String> requestMap, boolean isAdd){
         Category category = new Category();
         category.setId(Integer.parseInt(requestMap.get("idCategory")));
@@ -55,8 +70,8 @@ public class ProductServiceImpl implements ProductService {
             product.setStatus("true");
         }
         product.setCategory(category);
-        product.setNombrea(requestMap.get("Nombre"));
-        product.setDescrpcion(requestMap.get("descripcion"));
+        product.setNombre(requestMap.get("Nombre"));
+        product.setDescripcion(requestMap.get("descripcion"));
         product.setPrecio(Integer.parseInt(requestMap.get("precio")));
         return product;
     }
