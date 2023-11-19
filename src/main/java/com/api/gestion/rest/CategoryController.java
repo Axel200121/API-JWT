@@ -39,4 +39,15 @@ public class CategoryController {
         }
         return new ResponseEntity<>(new ArrayList(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+
+    @PutMapping("/update-category")
+    public ResponseEntity<String> updateCategory(@RequestBody(required = true) Map<String,String> requestMap){
+        try {
+            return  categoryService.updateCategory(requestMap);
+        }catch (Exception exception){
+            exception.printStackTrace();
+        }
+        return FacturaUtils.getResponseEntity(FacturaContants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

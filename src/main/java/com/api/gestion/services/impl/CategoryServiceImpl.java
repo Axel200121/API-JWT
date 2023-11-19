@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 @Slf4j //sir ve para los logs
@@ -62,6 +63,31 @@ public class CategoryServiceImpl implements CategoryService {
         }
         log.info("Metodo findAll de JpaRespository");
         return  new ResponseEntity<List<Category>>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> updateCategory(Map<String, String> requestMap) {
+        try {
+            if (jwtFilter.isAdmin()){
+                //creamos un metodo para validar la categoria
+                if (validateCategoryMap(requestMap,true)){ // se pasa true porque ya tiene su id
+                    Optional optional = categoryRepository.findById(Integer.parseInt(requestMap.get("id")));
+                    if (!optional.isEmpty()){
+                        categoryRepository.save(getCategoryFromMap(requestMap,true));
+                        return FacturaUtils.getResponseEntity("Categoria actualizada con éxito",HttpStatus.OK);
+                    }
+                    else{
+                        return FacturaUtils.getResponseEntity("La categeoria con ese ID no existe",HttpStatus.NOT_FOUND);
+                    }
+                }
+
+            }else {
+                return FacturaUtils.getResponseEntity(FacturaContants.UNAUTHORIZED_ACCESS,HttpStatus.UNAUTHORIZED);
+            }
+        }catch (Exception exception){
+            exception.printStackTrace();
+        }
+        return FacturaUtils.getResponseEntity(FacturaContants.SOMETHING_WENT_WRONG,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private boolean validateCategoryMap(Map<String,String> requestMap, boolean validateId){
