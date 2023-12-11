@@ -1,6 +1,6 @@
 package com.api.gestion.services;
 
-import com.api.gestion.dto.UserDTO;
+import com.api.gestion.dto.*;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -8,11 +8,13 @@ import java.util.Map;
 
 public interface UserService {
 
-    ResponseEntity<String> signUp(Map<String,String> requestMap);
+    ResponseEntity<ResponseDTO> signUp(UserDTO userDTO);
 
-    ResponseEntity<String> login(Map<String,String> rquestMap);
+    //ResponseEntity<ResponseTokenDTO> login(Map<String,String> rquestMap);
 
-    ResponseEntity<List<UserDTO>> getAllUsers();
+    ResponseEntity<ResponseTokenDTO> login(LoginDTO loginDTO);
+
+    ResponseEntity<List<UserListDTO>> getAllUsers();
 
     ResponseEntity<String> updateStatus(Map<String,String> requestMap);
 

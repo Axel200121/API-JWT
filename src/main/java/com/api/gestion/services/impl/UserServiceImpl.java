@@ -2,7 +2,7 @@ package com.api.gestion.services.impl;
 
 
 import com.api.gestion.contants.FacturaContants;
-import com.api.gestion.dto.UserDTO;
+import com.api.gestion.dto.*;
 import com.api.gestion.entities.User;
 import com.api.gestion.repositories.UserRepository;
 import com.api.gestion.security.CustomerDetailsService;
@@ -11,6 +11,7 @@ import com.api.gestion.security.jwt.JwtUtil;
 import com.api.gestion.services.UserService;
 import com.api.gestion.util.EmailUtils;
 import com.api.gestion.util.FacturaUtils;
+import com.api.gestion.util.GestionException;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,48 +49,48 @@ public class UserServiceImpl implements UserService{
 
 
     @Override
-    public ResponseEntity<String> signUp(Map<String, String> requestMap) {
-        log.info("Registro interno de un usuario {}", requestMap);
+    public ResponseEntity<ResponseDTO> signUp(UserDTO userDTO) {
+        log.info("Registro interno de un usuario {}", userDTO);
         try{
-            if (validateSignMap(requestMap)){
-                User user = userRepository.findByEmail(requestMap.get("email"));
+            if (validateSignMap(userDTO)){
+                User user = userRepository.findByEmail(userDTO.getEmail());
                 if (Objects.isNull(user)){
-                    userRepository.save(getUserFromMap(requestMap));
-                    return FacturaUtils.getResponseEntity("Usuario regsitrado con éxito", HttpStatus.CREATED);
+                    userRepository.save(getUserFromMap(userDTO));
+                    return GestionException.getResponseEntity("Usuario regsitrado con éxito", HttpStatus.CREATED);
                 }else{
-                    return FacturaUtils.getResponseEntity("El usuario con ese email ya existe", HttpStatus.BAD_REQUEST);
+                    return GestionException.getResponseEntity("El usuario con ese email ya existe", HttpStatus.BAD_REQUEST);
                 }
             }else{
-                return FacturaUtils.getResponseEntity(FacturaContants.INVALID_DATA,HttpStatus.BAD_REQUEST);
+                return GestionException.getResponseEntity(FacturaContants.INVALID_DATA,HttpStatus.BAD_REQUEST);
             }
         }catch (Exception exception){
             exception.printStackTrace();
         }
-        return FacturaUtils.getResponseEntity(FacturaContants.SOMETHING_WENT_WRONG,HttpStatus.INTERNAL_SERVER_ERROR);
+        return GestionException.getResponseEntity(FacturaContants.SOMETHING_WENT_WRONG,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
-    public ResponseEntity<String> login(Map<String, String> rquestMap) {
+    public ResponseEntity<ResponseTokenDTO> login(LoginDTO loginDTO) {
         log.info("Dentro del login {}");
         try {
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(rquestMap.get("email"), rquestMap.get("password"))
+                    new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword())
             );
             if (authentication.isAuthenticated()){
                 if (customerDetailsService.getUserDeatail().getStatus().equalsIgnoreCase("true")){
-                    return new ResponseEntity<String>("{\"token\":\"" + jwtUtil.generateToken(customerDetailsService.getUserDeatail().getEmail(), customerDetailsService.getUserDeatail().getRole()) + "\"}", HttpStatus.OK);
+                    return GestionException.getResponseEntityToken("Usuario logueado", jwtUtil.generateToken(customerDetailsService.getUserDeatail().getEmail(), customerDetailsService.getUserDeatail().getRole()) , HttpStatus.OK);
                 }else{
-                    return new ResponseEntity<String>("{\"mensaje\":\""+"Espere la aprobacion del administrador"+"\"}",HttpStatus.BAD_REQUEST);
+                    return GestionException.getResponseEntityToken("Espere la aprobacion del administrador","null", HttpStatus.BAD_REQUEST);
                 }
             }
         }catch (Exception exception){
             exception.printStackTrace();
         }
-        return new ResponseEntity<String>("{\"mensaje\":\""+"Credenciales incorrectas"+"\"}",HttpStatus.BAD_REQUEST);
+        return GestionException.getResponseEntityToken("Credenciales incorrectas","null", HttpStatus.BAD_REQUEST);
     }
 
     @Override
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
+    public ResponseEntity<List<UserListDTO>> getAllUsers() {
         try {
             if (jwtFilter.isAdmin()){
                 return  new ResponseEntity<>(userRepository.getAllUsers(),HttpStatus.OK);
@@ -174,20 +175,20 @@ public class UserServiceImpl implements UserService{
 
     }*/
 
-    private boolean validateSignMap(Map<String, String> requestMap){
-        if (requestMap.containsKey("nombre") && requestMap.containsKey("numeroContacto") &&
-                requestMap.containsKey("email") && requestMap.containsKey("password")){
+    private boolean validateSignMap(UserDTO userDTO){
+        if (userDTO.getNombre() != null && userDTO.getNumeroContacto() != null  &&
+                userDTO.getEmail() != null  &&  userDTO.getPassword()!= null  ){
             return true;
         }
         return false;
     }
 
-    private User getUserFromMap(Map<String, String> requestMap){
+    private User getUserFromMap(UserDTO userDTO){
         User user = new User();
-        user.setNombre(requestMap.get("nombre"));
-        user.setNumeroContacto(requestMap.get("numeroContacto"));
-        user.setEmail(requestMap.get("email"));
-        user.setPassword(requestMap.get("password"));
+        user.setNombre(userDTO.getNombre());
+        user.setNumeroContacto(userDTO.getNumeroContacto());
+        user.setEmail(userDTO.getEmail());
+        user.setPassword(userDTO.getPassword());
         user.setStatus("false");
         user.setRole("user");
         return user;

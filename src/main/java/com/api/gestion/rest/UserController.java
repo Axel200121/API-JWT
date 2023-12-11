@@ -1,9 +1,10 @@
 package com.api.gestion.rest;
 
 import com.api.gestion.contants.FacturaContants;
-import com.api.gestion.dto.UserDTO;
+import com.api.gestion.dto.*;
 import com.api.gestion.services.UserService;
 import com.api.gestion.util.FacturaUtils;
+import com.api.gestion.util.GestionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,33 +22,33 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<String> registerUser(@RequestBody(required = true)Map<String,String> requestMap){
+    public ResponseEntity<ResponseDTO> registerUser(@RequestBody(required = true) UserDTO userDTO){
         try {
-            return userService.signUp(requestMap);
+            return userService.signUp(userDTO);
         }catch (Exception exception){
             exception.printStackTrace();
         }
-        return FacturaUtils.getResponseEntity(FacturaContants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+        return GestionException.getResponseEntity(FacturaContants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody(required = true)  Map<String,String> requestMap){
+    public ResponseEntity<ResponseTokenDTO> login(@RequestBody(required = true)LoginDTO loginDTO){
         try {
-            return  userService.login(requestMap);
+            return  userService.login(loginDTO);
         }catch (Exception exception){
             exception.printStackTrace();
         }
-        return FacturaUtils.getResponseEntity(FacturaContants.SOMETHING_WENT_WRONG,HttpStatus.INTERNAL_SERVER_ERROR);
+        return GestionException.getResponseEntityToken(FacturaContants.SOMETHING_WENT_WRONG,"null",HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @GetMapping("/get-users")
-    public ResponseEntity<List<UserDTO>> getAllUsers(){
+    public ResponseEntity<List<UserListDTO>> getAllUsers(){
         try {
             return  userService.getAllUsers();
         }catch (Exception exception){
             exception.printStackTrace();
         }
-        return  new ResponseEntity<List<UserDTO>>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+        return  new ResponseEntity<List<UserListDTO>>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @PutMapping("/update-status")

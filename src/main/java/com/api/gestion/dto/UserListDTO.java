@@ -8,12 +8,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
+public class UserListDTO {
 
     private Integer id;
     private String nombre;
     private String email;
     private String numeroContacto;
-    private String password;
+    private String role;
+    private String status;
 
 }
